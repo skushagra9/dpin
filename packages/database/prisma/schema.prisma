@@ -1,14 +1,44 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  email     String
+  name      String
+  stripeId  String    @unique
+  monitors  Monitor[]
+  createdAt DateTime  @default(now())
+}
+
+model Validator {
+  id               String         @id @default(auto()) @map("_id") @db.ObjectId
+  address          String
+  monitorResults   MonitorResults[]
+  createdAt        DateTime       @default(now())
+}
+
+model Monitor {
+  id        String           @id @default(auto()) @map("_id") @db.ObjectId
+  url       String
+  user      User             @relation(fields: [userId], references: [id])
+  userId    String           @db.ObjectId
+  results   MonitorResults[]
+  createdAt DateTime         @default(now())
+}
+
+model MonitorResults {
+  id           String      @id @default(auto()) @map("_id") @db.ObjectId
+  monitor      Monitor     @relation(fields: [monitorId], references: [id])
+  monitorId    String      @db.ObjectId
+  status       String      @default("online") // online, offline, degraded, investigating, resolved, maintenance
+  responseTime Float
+  validator    Validator   @relation(fields: [validatorId], references: [id])
+  validatorId  String      @db.ObjectId
+  createdAt    DateTime    @default(now())
 }
