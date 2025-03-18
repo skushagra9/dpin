@@ -5,12 +5,13 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npx tsc && node dist/index.js"
+    "start": "pnpm tsc && node dist/index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@repo/database": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/ws": "^8.18.0",
     "ws": "^8.18.1"

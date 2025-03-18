@@ -1,8 +1,8 @@
 import express from "express";
 import cors from "cors";
-import DbConnection from "@repo/database";
+import getPrismaInstance from "@repo/database";
 
-const prisma = DbConnection.getInstance();
+const prisma = getPrismaInstance();
 
 const app = express();
 app.use(cors());
