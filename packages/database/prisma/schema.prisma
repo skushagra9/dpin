@@ -19,8 +19,8 @@ model User {
 model Validator {
   id               String         @id @default(auto()) @map("_id") @db.ObjectId
   address          String
-  monitorResults   MonitorResults[]
   createdAt        DateTime       @default(now())
+  results          MonitorResults[]
 }
 
 model Monitor {
@@ -28,8 +28,6 @@ model Monitor {
   url       String
   user      User             @relation(fields: [userId], references: [id])
   userId    String           @db.ObjectId
-  picked    Boolean          @default(false)
-  pickedAt  DateTime?
   results   MonitorResults[]
   createdAt DateTime         @default(now())
 }
@@ -38,8 +36,9 @@ model MonitorResults {
   id           String      @id @default(auto()) @map("_id") @db.ObjectId
   monitor      Monitor     @relation(fields: [monitorId], references: [id])
   monitorId    String      @db.ObjectId
-  status       String      @default("online") // online, offline, degraded, investigating, resolved, maintenance
+  status       Int
   responseTime Float
+  result       Boolean
   validator    Validator   @relation(fields: [validatorId], references: [id])
   validatorId  String      @db.ObjectId
   createdAt    DateTime    @default(now())

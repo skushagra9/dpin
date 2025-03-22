@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "pnpm tsc && node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -11,7 +12,13 @@
   "license": "ISC",
   "dependencies": {
     "@repo/typescript-config": "workspace:*",
+    "@solana/web3.js": "^1.98.0",
+    "@types/dotenv": "^8.2.3",
     "@types/ws": "^8.18.0",
+    "dotenv": "^16.4.7",
+    "tweetnacl": "^1.0.3",
+    "tweetnacl-util": "^0.15.1",
+    "uuid": "^11.1.0",
     "ws": "^8.18.1"
   }
 }
