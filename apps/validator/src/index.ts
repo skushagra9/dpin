@@ -50,7 +50,7 @@ wss.on("error", (error) => {
 
 const signMessage = async (uuid: string) => {
     
-    const secretKeyArray: number[] = JSON.parse(process.env.SOLANA_PRIV_KEY as string);
+    const secretKeyArray: number[] = JSON.parse(SOLANA_PRIV_KEY as string);
     const keypair = Keypair.fromSecretKey(new Uint8Array(secretKeyArray));
 
     const message = "Authentication Request from " + uuid;

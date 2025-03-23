@@ -18,8 +18,9 @@ model User {
 
 model Validator {
   id               String         @id @default(auto()) @map("_id") @db.ObjectId
-  address          String
+  address          String         @unique
   createdAt        DateTime       @default(now())
+  balance          Int            @default(0)
   results          MonitorResults[]
 }
 
