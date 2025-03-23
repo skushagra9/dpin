@@ -44,6 +44,7 @@ wss.on("connection", async (ws: ValidatedClient) => {
                         }
                         requestMappings.set(payload.id, {
                             callback: async (responsePayload: ResponsePayload) => {
+                                // this should be pushed to a queue, and a worker should handle it.
                                 try {
                                     console.log(responsePayload, "responsePayload", responsePayload.result);
                                     const monitors = await prisma.monitor.findMany({
@@ -170,7 +171,6 @@ const distributeRequests = async () => {
     console.error(error);
    }
 }
-
 
 const checkInvalidConnections = async () => {
     requestMappings.forEach((connection, key) => {
