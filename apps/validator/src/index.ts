@@ -1,47 +1,38 @@
 import WebSocket from "ws";
 import { v4 as uuidv4 } from "uuid";
-import { SOLANA_PRIV_KEY, SOLANA_PUB_KEY } from "./utils/lib";
+import { SOLANA_PRIV_KEY, SOLANA_PUB_KEY } from "./utils/ consts";
 import { Keypair } from "@solana/web3.js";
 import nacl from "tweetnacl";
 import nacl_util from "tweetnacl-util";
+import { WS_URL } from "./utils/ consts";
 
+const wss = new WebSocket(WS_URL as string);
+let id: string;
 
-const wss = new WebSocket.Server({ port: 8081 });
-
-const map = new Map<string, string>();
-
-
-wss.on("connection", async(ws) => {
-    const id = uuidv4();
+wss.on("open", async() => {
+    id = uuidv4();
     const message = await sendMessage(id);
+    wss.send(JSON.stringify({ type: 'VALIDATION_REQUEST', payload: message }));
+});
 
-    ws.send(JSON.stringify({ type: 'VALIDATION_REQUEST', payload: message }));
-
-    ws.on("message", async(message: any) => {
-        try {
-            const { type, payload } = JSON.parse(message.toString());
-            switch (type) {
-                case 'VALIDATION_RESPONSE':
-                    if (payload.id === id) {
-                        map.set(id, payload.urls);
-                        const result = await checkEndpoints(payload.urls);
-                        ws.send(JSON.stringify({ type: 'UPDATE', payload: { id, result } }));
-                    }
-                    break;
-                default:
-                    console.log('Unknown message type:', type);
-            }
-        } catch (error) {
-            console.error(error);
+wss.on("message", async(message: any) => {
+    try {
+        const { type, payload } = JSON.parse(message.toString());
+        console.log("type", type, payload);
+        switch (type) {
+            case 'VALIDATION_RESPONSE':
+                if (payload.id === id) {
+                    const result = await checkEndpoints(payload.urls);
+                    console.log("result", result);
+                    wss.send(JSON.stringify({ type: 'UPDATE', payload: { id, result, validatorId: payload.validatorId } }));
+                }
+                break;
+            default:
+                console.log('Unknown message type:', type);
         }
-    });
-    ws.on("close", () => {
-        console.log("Client disconnected");
-        map.delete(id);
-    });
-    ws.on("error", (error: any) => {
+    } catch (error) {
         console.error(error);
-    });
+    }
 });
 
 wss.on("error", (error) => {

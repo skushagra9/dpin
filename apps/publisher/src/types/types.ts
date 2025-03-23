@@ -16,7 +16,7 @@ export interface UrlResult {
     responseTime: number;
 }
 export interface ResponsePayload {
-    results: {
+    result: {
         url: string,
         result: UrlResult
     }[];
