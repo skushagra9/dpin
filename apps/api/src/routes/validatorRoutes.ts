@@ -1,5 +1,6 @@
 import getPrismaInstance from "@repo/database";
 import { Router } from "express";
+import { paymentsQueue } from "@repo/redis";
 
 const router: Router = Router();
 const prisma = getPrismaInstance();
@@ -15,11 +16,18 @@ router.get("/balance", async (req, res) => {
 
 router.post("/withdraw", async (req, res) => {
     const { address } = req.body;
-    //send solana to this address from the balance
-    await prisma.validator.update({
+
+    // send this in a redis queue
+    //solana transaction
+    const validator = await prisma.validator.findUnique({
         where: { address },
-        data: { balance: 0 },
     });
+    if (!validator) {
+        res.status(400).send("Validator not found");
+        return;
+    }
+
+    await paymentsQueue.add("withdraw", { address: validator.address, amount: validator.balance });
     res.send(true);
 });
 
